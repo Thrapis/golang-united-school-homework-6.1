@@ -1,8 +1,13 @@
 package golang_united_school_homework
 
 import (
-	"fmt"
-	"reflect"
+	"errors"
+)
+
+var (
+	errorCapacityLimitEstablished = errors.New("shapes capacity limit established")
+	errorIndexOutOfRange          = errors.New("index out of range")
+	errorCirclesAreNotExist       = errors.New("circles are not exist in the list")
 )
 
 // box contains list of shapes and able to perform operations on them
@@ -26,7 +31,7 @@ func (b *box) AddShape(shape Shape) error {
 		b.shapes = append(b.shapes, shape)
 		return nil
 	}
-	return fmt.Errorf("shapes capacity limit established")
+	return errorCapacityLimitEstablished
 }
 
 // GetByIndex allows getting shape by index
@@ -35,7 +40,7 @@ func (b *box) GetByIndex(i int) (Shape, error) {
 	if i < len(b.shapes) {
 		return b.shapes[i], nil
 	}
-	return nil, fmt.Errorf("index out of range")
+	return nil, errorIndexOutOfRange
 }
 
 // ExtractByIndex allows getting shape by index and removes this shape from the list.
@@ -46,7 +51,7 @@ func (b *box) ExtractByIndex(i int) (Shape, error) {
 		b.shapes = append(b.shapes[:i], b.shapes[i+1:]...)
 		return buf, nil
 	}
-	return nil, fmt.Errorf("index out of range")
+	return nil, errorIndexOutOfRange
 }
 
 // ReplaceByIndex allows replacing shape by index and returns removed shape.
@@ -57,7 +62,7 @@ func (b *box) ReplaceByIndex(i int, shape Shape) (Shape, error) {
 		b.shapes[i] = shape
 		return buf, nil
 	}
-	return nil, fmt.Errorf("index out of range")
+	return nil, errorIndexOutOfRange
 }
 
 // SumPerimeter provides sum perimeter of all shapes in the list.
@@ -81,13 +86,13 @@ func (b *box) SumArea() (sum float64) {
 func (b *box) RemoveAllCircles() error {
 	removed := 0
 	for i := 0; i < len(b.shapes); {
-		if reflect.TypeOf(b.shapes[i]) == reflect.TypeOf(Circle{}) {
+		if _, ok := b.shapes[i].(*Circle); ok {
 			b.shapes = append(b.shapes[:i], b.shapes[i+1:]...)
 			removed++
 		} else { i++ }
 	}
 	if removed == 0 {
-		return fmt.Errorf("circles are not exist in the list")
+		return errorCirclesAreNotExist
 	}
 	return nil
 }
